@@ -1,49 +1,43 @@
-# RoadView
+# roadview — BlackRoad OS
 
-*See the road ahead. Every answer verified.*
+**Live:** [roadview.blackroad.io](https://roadview.blackroad.io)
+**Part of:** [BlackRoad OS](https://os.blackroad.io) — browser-based desktop with 27 AI agents
 
-Sovereign search engine that searches your personal data, the web, and the blockchain — then delivers every answer with cryptographic proof.
+## Try It
 
-## The Ride
+Open [os.blackroad.io](https://os.blackroad.io) in any browser. No signup required. Click roadview in the dock.
 
-Check RoadView. Need directions? RoadView searches everything — your files, the web, the blockchain — and shows you the answer with proof. No ads. No spam. Every result verified.
+Or visit [roadview.blackroad.io](https://roadview.blackroad.io) directly.
 
 ## What It Does
 
-Privacy-first semantic search across your entire BlackRoad history, the open web, and RoadChain records. Every sourced claim displays a verification badge. Includes the G(n) Amundson calculator and trending queries.
+roadview is one of 17 products in BlackRoad OS, a browser-based operating system running on 5 Raspberry Pi 5 computers with Hailo-8 AI accelerators.
 
-## Integrations
+- **    5202 lines** of working code
+- Workers AI powered (Llama 3.1/3.2)
+- D1 database (SQLite at edge)
+- Part of the 27-agent ecosystem
+- No ads. No tracking. No algorithm.
 
-| Service | Role |
-|---------|------|
-| **Cloudflare Workers** | Search engine runtime at the edge |
-| **Cloudflare D1** | Search index, query history, trending data |
-| **Cloudflare KV** | Fast result caching |
-| **Workers AI** | Semantic search and AI summarization |
-| **Ollama** | Local inference for private searches |
-| **RoadChain** | Verification badges — every result cross-checked |
-| **RoadCoin** | Earn ROAD for rating and sharing verified answers |
+## Stack
 
-## Features
+- Runtime: Cloudflare Workers
+- Database: Cloudflare D1
+- AI: Workers AI
+- Auth: CarKeys (JWT + D1 sessions)
 
-- Unified search across personal data + web + blockchain
-- RoadChain "Verified" badges with expandable proof chains
-- G(n) Amundson constant calculator built in
-- Trending queries dashboard
-- 7,871 indexed pages
-- Zero-hallucination mode — every claim linked to a verifiable source
-- Custom filters: my data only, verified only, academic only, web only
-- "Ask the Convoy" — hand any search to RoadTrip agents
-- No ads, no sponsored results, no tracking
+## BlackRoad OS
 
-## Status
+17 products. 27 AI agents. 4 workspaces. Voice commands. Mesh compute. $200 of hardware.
 
-**LIVE** — 2,273 lines, 7,871 indexed pages | [search.blackroad.io](https://search.blackroad.io)
+- **OS:** [os.blackroad.io](https://os.blackroad.io)
+- **Social:** [backroad.blackroad.io](https://backroad.blackroad.io)
+- **Agents:** [roadtrip.blackroad.io](https://roadtrip.blackroad.io)
+- **Tutor:** [roadie.blackroad.io](https://roadie.blackroad.io)
+- **Search:** [roadview.blackroad.io](https://roadview.blackroad.io)
+- **Code:** [roadcode.blackroad.io](https://roadcode.blackroad.io)
+- **GitHub:** [github.com/BlackRoadOS](https://github.com/BlackRoadOS)
 
-## How It Powers The BlackRoad
+## License
 
-RoadView is the windshield — the clear view that lets you see exactly what's ahead without guessing. Every question becomes a verifiable, provable answer.
-
----
-
-Part of [BlackRoad OS](https://blackroad.io) — Remember the Road. Pave Tomorrow.
+PROPRIETARY. Copyright 2025-2026 BlackRoad OS, Inc. All rights reserved.
