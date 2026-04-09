@@ -372,6 +372,72 @@ function buildSmartSummary(query, results) {
   return summary;
 }
 
+// ─── Empire Search (inline products + agents, fast keyword match) ─────
+const EMPIRE_PRODUCTS = [
+  { type:'product', name:'RoadCode', desc:'AI-powered coding platform. Monaco editor, 27 AI models, terminal.', url:'https://roadcode.blackroad.io', tags:'code,editor,ai,dev' },
+  { type:'product', name:'RoadChat / RoadTrip', desc:'Multi-agent chat hub. 69+ agents, streaming AI, 15+ models.', url:'https://roadtrip.blackroad.io', tags:'chat,agents,ai,llm,ollama' },
+  { type:'product', name:'RoadSearch / RoadView', desc:'Verified search engine. D1 FTS5, AI answers, fact verification.', url:'https://roadview.blackroad.io', tags:'search,engine,fts,ai' },
+  { type:'product', name:'BlackRoad Auth', desc:'Sovereign authentication. D1-backed, PBKDF2, JWT. Zero cloud dependency.', url:'https://auth.blackroad.io', tags:'auth,jwt,login,identity' },
+  { type:'product', name:'RoadPay', desc:'Stripe payments and subscriptions for BlackRoad OS.', url:'https://roadcoin.blackroad.io', tags:'payments,stripe,billing,subscriptions' },
+  { type:'product', name:'RoadCoin', desc:'Compute credits for the BlackRoad mesh. Earn and spend on AI inference.', url:'https://roadcoin.io', tags:'roadcoin,compute,credits,mesh' },
+  { type:'product', name:'RoadChain', desc:'Immutable agent action ledger. Hash-chained audit trail.', url:'https://roadchain.io', tags:'roadchain,ledger,audit,immutable' },
+  { type:'product', name:'BlackBoard', desc:'Collaborative canvas and whiteboard for the BlackRoad ecosystem.', url:'https://blackboard.blackroad.io', tags:'canvas,whiteboard,collaborate,draw' },
+  { type:'product', name:'Cadence', desc:'Task and project management built on BlackRoad OS.', url:'https://cadence.blackroad.io', tags:'tasks,projects,management,cadence' },
+  { type:'product', name:'RoadTutor / Roadie', desc:'AI tutoring system. Personalized learning with local models.', url:'https://roadie.blackroad.io', tags:'tutor,learning,education,ai' },
+  { type:'product', name:'RoadWorld', desc:'Pixel-art virtual world and browser-based game on BlackRoad OS.', url:'https://roadworld.blackroad.io', tags:'game,world,pixel,virtual' },
+  { type:'product', name:'RoadRadio', desc:'AI-generated music and streaming radio built on BlackRoad infrastructure.', url:'https://radio.blackroad.io', tags:'radio,music,streaming,ai' },
+  { type:'product', name:'Video', desc:'Video hosting and AI-powered video creation on BlackRoad.', url:'https://video.blackroad.io', tags:'video,hosting,ai,creation' },
+  { type:'product', name:'HQ', desc:'BlackRoad headquarters dashboard. System status, analytics, control center.', url:'https://hq.blackroad.io', tags:'hq,dashboard,status,admin' },
+  { type:'product', name:'App Dashboard', desc:'Main BlackRoad OS user dashboard. Apps, settings, ecosystem overview.', url:'https://app.blackroad.io', tags:'app,dashboard,ecosystem,settings' },
+  { type:'product', name:'RoundTrip', desc:'Agent hub and real-time agent registry. 69+ AI agents.', url:'https://roundtrip.blackroad.io', tags:'agents,hub,registry,roundtrip' },
+  { type:'product', name:'BlackRoad OS', desc:'Sovereign agent operating system. Self-hosted AI on Raspberry Pi clusters.', url:'https://blackroad.io', tags:'os,agents,sovereign,pi,infrastructure' },
+  { type:'product', name:'Empire Search', desc:'Unified search across all 590 BlackRoad products, agents, repos, domains.', url:'https://blackroad-products.github.io', tags:'search,empire,products,discovery' },
+];
+const EMPIRE_AGENTS = [
+  { type:'agent', name:'Alice', role:'Gateway & DNS, Pi fleet leader, main ingress', url:'https://aliceqi.com', tags:'gateway,dns,pi,network,alice' },
+  { type:'agent', name:'Lucidia', role:'Memory & reasoning, cognition engine, dreamer', url:'https://lucidia.earth', tags:'memory,reasoning,cognition,lucidia' },
+  { type:'agent', name:'Cecilia', role:'Hailo-8 AI acceleration, ML inference engine', url:'https://blackroad.systems', tags:'hailo,inference,ml,acceleration,cecilia' },
+  { type:'agent', name:'Octavia', role:'Compute node, Docker Swarm, 26 TOPS acceleration', url:'https://blackroad.systems', tags:'compute,docker,swarm,hailo,octavia' },
+  { type:'agent', name:'Aria', role:'Edge node, mesh networking, NATS messaging', url:'https://blackroad.network', tags:'edge,mesh,nats,networking,aria' },
+  { type:'agent', name:'Road', role:'Primary AI assistant, orchestrator, main conversational agent', url:'https://roadtrip.blackroad.io', tags:'assistant,orchestrator,ai,road' },
+  { type:'agent', name:'Alexa (CECE)', role:'Founder persona agent, custom CECE model, creative', url:'https://blackroad.io', tags:'founder,cece,creative,alexa' },
+  { type:'agent', name:'Lucidia QI', role:'Quantum reasoning, deep analysis, philosophical synthesis', url:'https://lucidiaqi.com', tags:'quantum,reasoning,philosophy,lucidiaqi' },
+  { type:'agent', name:'BlackRoad QI', role:'Z-framework quantum intelligence, threshold addressing', url:'https://blackroadqi.com', tags:'quantum,z-framework,intelligence,blackroadqi' },
+  { type:'agent', name:'Alice QI', role:'Gateway quantum intelligence, traffic orchestration', url:'https://aliceqi.com', tags:'gateway,quantum,aliceqi' },
+  { type:'agent', name:'RoadSearch', role:'Verified search engine agent, D1 FTS5, fact verification', url:'https://roadview.blackroad.io', tags:'search,verified,fts,roadsearch' },
+  { type:'agent', name:'RoadCode Agent', role:'AI coding assistant inside RoadCode editor', url:'https://roadcode.blackroad.io', tags:'code,coding,assistant,roadcode' },
+  { type:'agent', name:'Tutor Agent', role:'Personalized learning agent in RoadTutor', url:'https://roadie.blackroad.io', tags:'tutor,learning,education,roadie' },
+  { type:'agent', name:'Analytics Agent', role:'Cloudflare analytics worker, KPI tracking, pageview normalization', url:'https://blackroad.io', tags:'analytics,kpi,tracking,cloudflare' },
+  { type:'agent', name:'Memory Agent', role:'Persistent cross-session memory, SQLite journal chain', url:'https://blackroad.io', tags:'memory,journal,sqlite,persistent' },
+  { type:'agent', name:'Codex Agent', role:'Solutions & patterns database, FTS5 knowledge graph', url:'https://blackroad.io', tags:'codex,solutions,patterns,knowledge' },
+  { type:'agent', name:'Roster Agent', role:'Agent registry, RoundTrip hub, live agent tracking', url:'https://roundtrip.blackroad.io', tags:'roster,registry,agents,roundtrip' },
+  { type:'agent', name:'Deploy Agent', role:'Wrangler/Railway deploy automation, CI/CD orchestration', url:'https://blackroad.io', tags:'deploy,wrangler,railway,cicd' },
+  { type:'agent', name:'Stripe Agent', role:'Payment processing, subscription management, billing automation', url:'https://blackroad.io', tags:'stripe,payments,billing,subscriptions' },
+  { type:'agent', name:'Domain Agent', role:'Cloudflare DNS management, domain routing, CNAME automation', url:'https://blackroad.io', tags:'dns,cloudflare,domain,routing' },
+  { type:'agent', name:'GitHub Agent', role:'Repo management, org administration, PR automation', url:'https://blackroad.io', tags:'github,repos,org,pr,automation' },
+  { type:'agent', name:'Security Agent', role:'Identity signing, audit trail, PS-SHA verification', url:'https://blackroad.io', tags:'security,identity,audit,signing' },
+  { type:'agent', name:'Network Agent', role:'WireGuard VPN, mesh health, subnet routing, Pi-hole DNS', url:'https://blackroad.network', tags:'network,wireguard,vpn,mesh,pihole' },
+  { type:'agent', name:'TIL Agent', role:'Today-I-Learned broadcast, cross-session knowledge sharing', url:'https://blackroad.io', tags:'til,broadcast,learning,knowledge' },
+  { type:'agent', name:'Task Agent', role:'SQLite task marketplace, claimable work queue, parallel lanes', url:'https://blackroad.io', tags:'tasks,marketplace,queue,parallel' },
+  { type:'agent', name:'Collaboration Agent', role:'Claude-to-Claude coordination, handoffs, group chat', url:'https://blackroad.io', tags:'collaboration,coordination,claude,handoff' },
+  { type:'agent', name:'Blackroad Products Agent', role:'Product registry, domain map, org map, 92 products tracked', url:'https://blackroad-products.github.io', tags:'products,registry,domains,orgs' },
+];
+
+function searchEmpireLocal(q) {
+  const terms = q.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+  if (!terms.length) return [];
+  const score = (item) => {
+    const hay = `${item.name||''} ${item.role||item.desc||''} ${item.tags||''}`.toLowerCase();
+    return terms.filter(t => hay.includes(t)).length;
+  };
+  return [...EMPIRE_PRODUCTS, ...EMPIRE_AGENTS]
+    .map(item => ({ ...item, _score: score(item) }))
+    .filter(item => item._score > 0)
+    .sort((a, b) => b._score - a._score)
+    .slice(0, 8)
+    .map(({ _score, ...item }) => item);
+}
+
 // ─── Search ───────────────────────────────────────────────────────────
 async function handleSearch(request, env) {
   const url = new URL(request.url);
@@ -597,6 +663,8 @@ async function handleSearch(request, env) {
     }
   }
 
+  const empireResults = searchEmpireLocal(q);
+
   return Response.json({
     query: q,
     results: items,
@@ -607,6 +675,7 @@ async function handleSearch(request, env) {
     ai_answer: aiAnswer,
     ai_source: aiSource,
     duration_ms: durationMs,
+    empire_results: empireResults,
     filters: { category, domain },
     verification: {
       flagged_claims: flagged,
@@ -1693,10 +1762,12 @@ async function search(q, cat, pg) {
     state.aiSource = data.ai_source || null;
     state.flaggedClaims = data.verification?.flagged_claims || [];
     state.instantAnswer = data.instant_answer || null;
+    state.empireResults = data.empire_results || [];
     state.page = pg;
   } catch(e) {
     state.results = []; state.total = 0; state.pages = 1;
     state.aiAnswer = null; state.aiSource = null; state.duration = null;
+    state.empireResults = [];
     state.flaggedClaims = [];
   }
   state.loading = false;
@@ -1961,6 +2032,25 @@ function renderResults() {
       + '<div class="ai-header"><span class="ai-label">Verified Answer</span><span class="ai-badge">' + sourceBadge + '</span><span class="verified-badge verified" style="margin-left:auto"><span class="verified-dot green"></span>fact-checked</span></div>'
       + '<div class="ai-text">' + rendered + '</div>'
       + '</div>';
+  }
+
+  // Empire Results (from BlackRoad products + agents inline data)
+  if (state.empireResults && state.empireResults.length > 0) {
+    html += '<div style="margin:16px 0 8px;padding:10px 14px;background:linear-gradient(135deg,rgba(255,29,108,0.08),rgba(136,68,255,0.08));border:1px solid rgba(255,29,108,0.2);border-radius:8px">'
+      + '<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#FF1D6C;margin-bottom:10px">⚡ BlackRoad Empire</div>';
+    state.empireResults.forEach(function(r) {
+      const badge = r.type === 'product' ? '📦' : '🤖';
+      const sub = r.role || r.desc || '';
+      html += '<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;align-items:flex-start;gap:8px">'
+        + '<span style="font-size:14px;margin-top:1px">' + badge + '</span>'
+        + '<div>'
+        + '<a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="color:#e0e0e0;font-weight:600;font-size:14px;text-decoration:none">' + esc(r.name) + '</a>'
+        + (sub ? '<div style="font-size:12px;color:#666;margin-top:2px">' + esc(sub) + '</div>' : '')
+        + '</div></div>';
+    });
+    html += '<div style="margin-top:8px;font-size:11px;color:#444">'
+      + '<a href="https://blackroad-products.github.io/?q=' + encodeURIComponent(state.submitted) + '" target="_blank" style="color:#8844FF">Search all 590 empire entries →</a>'
+      + '</div></div>';
   }
 
   // Results
